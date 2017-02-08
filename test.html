@@ -1,1 +1,34 @@
-Test
+app.get("/scrape", (req, res) =>{
+
+    request("https://news.ycombinator.com/", (error, response, html)=>{
+        var $ = cheerio.load(html);
+
+        $(".title").each((i, element)=>{
+            var title = $(this).children("a").text();
+            var link = $(this).children("a").attr("href");
+
+                    if(title && link){
+                        db.classroom.save({
+                            title: title,
+                            link: link
+                        },
+                        (error, saved)=>{
+                            if(error){
+                                console.log(error)
+                            }
+                            else{
+                                console.log(saved)
+                            }
+                        }
+                        }
+        });
+        })
+        res.send("Scrape complete")
+    })
+})
+
+
+db.classroom.insert({"name": "Lisa", "row": 1, "os": "mac", "hobbies":["coding", "hiking", "cocktails"]})
+
+
+https://query.nytimes.com/search/sitesearch/?action=click&contentCollection&region=TopBar&WT.nav=searchWidget&module=SearchSubmit&pgtype=Homepage#/top stories
