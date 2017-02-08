@@ -32,27 +32,28 @@ app.get("/all", (req, res) => {
     })
 })
 
+app.get("/empty", (req, res)=>{
+    db.scrapedData.remove({
+        
+    })
+    res.send("OH YEAH")
+});
 
 
 app.get("/scrape", (req, res) => {
 
-    request("http://cnn.com/", (error, response, html) => {
+    request("https://news.google.com/", (error, response, html) => {
         var $ = cheerio.load(html);
-        // console.log(html)
-        // $('.cd__headline-icon').each(function (i, element) {
-        //     var a = $(this).prev();
-$('.cd__headline').each(function(i, elm) {
-    var a = $(this).text() // for testing do text() 
 
-            console.log("test" + a)
-            var link = a.attr('href');
-            var title = a.text();
-
-            if (title && link) {
+        $('.esc-lead-article-title').each(function (i, element) {
+            var a = $(this).children("a").text();
+            var b = $(this).children("a").attr("href")
+            if (a && b) {
 
                 db.scrapedData.save({
-                    title: title,
-                    link: link
+                    title: a,
+                    link: b
+                    
                 }),
                     (error, saved) => {
                         if (error) {
