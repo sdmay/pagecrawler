@@ -3,8 +3,25 @@ var bodyParser = require("body-parser");
 var mongojs = require("mongojs");
 var request = require("request");
 var cheerio = require("cheerio");
+var exphbs = require("express-handlebars");
 
 var app = express();
+
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.set("view engine", "handlebars");
+
+// app.use(require('cookie-parser')());
+
+// Sets up the Express app to handle data parsing
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.text());
+app.use(bodyParser.json({ type: "application/vnd.api+json" }));
+
+// Static directory
+app.use(express.static("./public"));
+
+
 
 var databaseUrl = "scraper";
 var collections = ["scrapedData"];
@@ -28,6 +45,19 @@ app.get("/all", (req, res) => {
         else {
             console.log(found)
             res.json(found)
+        }
+    })
+})
+
+app.get("/added", (req, res) => {
+    db.scrapedData.find({}, (err, found) => {
+        if (err) {
+
+            console.log(err);
+        }
+        else {
+            console.log(found)
+            res.render("added", {object: found})
         }
     })
 })
@@ -75,6 +105,45 @@ app.get("/scrape", (req, res) => {
 
 })
 
+app.get("/test", (req, res)=>{
+    res.render("test")
+})
+
+app.get("/front", (req, res) => {
+
+    request("https://www.reddit.com/r/all/", (error, response, html) => {
+        var $ = cheerio.load(html);
+
+        $('.title').each(function (i, element) {
+            var a = $(this).children("a").text();
+            var b = $(this).children("a").attr("href")
+            if (a && b) {
+
+                db.scrapedData.save({
+                    title: a,
+                    link: b
+                    
+                }),
+                    (error, saved) => {
+                        if (error) {
+                            console.log(error);
+                        }
+                        else {
+                            console.log(saved);
+                             
+                        }
+                    }
+            }
+
+
+            else {
+                console.log(error)
+            }
+        })
+    })
+res.render("added")   
+
+})
 
 app.listen(3000, () => {
     console.log("listening")

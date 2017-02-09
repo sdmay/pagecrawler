@@ -5,12 +5,16 @@
 </head>
 
 <body>
+<h1>home PAGE</h1>
 
+{{{body}}}
 </body>
 
 <script>
 
 
+$(".tester").on("click",()=>{
+    console.log("CLICK")
     var jsonRequestUrl = 'http://www.reddit.com/r/funny/comments/1v6rrq.json';
 var decoder = $('<div />');
 var decodedText = '';
@@ -23,9 +27,10 @@ $.getJSON(jsonRequestUrl, function foo(result) {
         decodedText += decoder.text();
     });
 
-    $('#content').append(decodedText);
+    $('.tester').append(decodedText);
 });
 })
+
 
 </script>
 <html>
